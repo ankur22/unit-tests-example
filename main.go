@@ -8,3 +8,7 @@ func main() {
 // e.g. https://google.com/search?q=blah -> urls.com/12
 type URLShortner struct {
 }
+
+func (u *URLShortner) Shorten(in string) (string, error) {
+	return "", nil
+}
