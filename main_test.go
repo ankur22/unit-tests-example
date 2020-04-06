@@ -23,7 +23,7 @@ func TestURLShortner(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			s := &URLShortner{}
+			s := &URLShortner{baseURL: "urls.com", i: 0, store: make(map[string]string)}
 
 			resp, err := s.Shorten(test.in)
 
