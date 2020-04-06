@@ -1,4 +1,4 @@
-package main_test
+package main
 
 import (
 	"errors"
@@ -20,7 +20,9 @@ func TestURLShortner(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			s URLShortner{}
+			s := &URLShortner{}
+
+			resp, err := s.Shorten(test.in)
 		})
 	}
 }
