@@ -22,10 +22,35 @@ func TestURLShortner(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run("Shorten"+test.name, func(t *testing.T) {
 			s := &URLShortner{baseURL: "urls.com", i: 0, store: make(map[string]string)}
 
 			resp, err := s.Shorten(test.in)
+
+			assert.Equal(t, test.err, err)
+			assert.Equal(t, test.expected, resp)
+		})
+	}
+
+	var tests2 = []struct {
+		name     string
+		in1      string
+		in2      string
+		expected string
+		err      error
+	}{
+		{"NoScheme", "google.com", "urls.com/1", "https://google.com", nil},
+		{"WithScheme", "https://google.com", "urls.com/1", "https://google.com", nil},
+		{"NoSchemeAndTLD", "google", "urls.com/1", "", errors.New("Not found")},
+		{"NoTLD", "https://google", "urls.com/1", "", errors.New("Not found")},
+	}
+
+	for _, test := range tests2 {
+		t.Run("Get"+test.name, func(t *testing.T) {
+			s := &URLShortner{baseURL: "urls.com", i: 0, store: make(map[string]string)}
+
+			s.Shorten(test.in1)
+			resp, err := s.Get(test.in2)
 
 			assert.Equal(t, test.err, err)
 			assert.Equal(t, test.expected, resp)

@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-func main() {
-
-}
-
 // URLShortner will return a shortened url of the input url
 // e.g. https://google.com/search?q=blah -> urls.com/12
 type URLShortner struct {
@@ -29,11 +25,18 @@ func (u *URLShortner) Shorten(in string) (string, error) {
 		in = fmt.Sprintf("https://%s", in)
 	}
 
+	u.i++
+	val := fmt.Sprintf("%s/%d", u.baseURL, u.i)
+	u.store[val] = in
+
+	return val, nil
+}
+
+// Get the full URL with the shortened URL
+func (u *URLShortner) Get(in string) (string, error) {
 	val, ok := u.store[in]
 	if !ok {
-		u.i++
-		val = fmt.Sprintf("%s/%d", u.baseURL, u.i)
-		u.store[in] = val
+		return "", errors.New("Not found")
 	}
 
 	return val, nil
