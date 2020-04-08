@@ -9,9 +9,8 @@ import (
 // URLShortner will return a shortened url of the input url
 // e.g. https://google.com/search?q=blah -> urls.com/12
 type URLShortner struct {
-	baseURL string
-	store   map[string]string
-	i       int
+	store map[string]string
+	i     int
 }
 
 // Shorten will convert urls to a shortened url
@@ -26,7 +25,7 @@ func (u *URLShortner) Shorten(in string) (string, error) {
 	}
 
 	u.i++
-	val := fmt.Sprintf("%s/%d", u.baseURL, u.i)
+	val := fmt.Sprintf("%d", u.i)
 	u.store[val] = in
 
 	return val, nil

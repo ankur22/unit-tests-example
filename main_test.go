@@ -15,15 +15,15 @@ func TestURLShortner(t *testing.T) {
 		expected string
 		err      error
 	}{
-		{"NoScheme", "google.com", "urls.com/1", nil},
-		{"WithScheme", "https://google.com", "urls.com/1", nil},
+		{"NoScheme", "google.com", "1", nil},
+		{"WithScheme", "https://google.com", "1", nil},
 		{"NoSchemeAndTLD", "google", "", errors.New("invalid")},
 		{"NoTLD", "https://google", "", errors.New("invalid")},
 	}
 
 	for _, test := range tests {
 		t.Run("Shorten"+test.name, func(t *testing.T) {
-			s := &URLShortner{baseURL: "urls.com", i: 0, store: make(map[string]string)}
+			s := &URLShortner{i: 0, store: make(map[string]string)}
 
 			resp, err := s.Shorten(test.in)
 
@@ -39,15 +39,15 @@ func TestURLShortner(t *testing.T) {
 		expected string
 		err      error
 	}{
-		{"NoScheme", "google.com", "urls.com/1", "https://google.com", nil},
-		{"WithScheme", "https://google.com", "urls.com/1", "https://google.com", nil},
-		{"NoSchemeAndTLD", "google", "urls.com/1", "", errors.New("Not found")},
-		{"NoTLD", "https://google", "urls.com/1", "", errors.New("Not found")},
+		{"NoScheme", "google.com", "1", "https://google.com", nil},
+		{"WithScheme", "https://google.com", "1", "https://google.com", nil},
+		{"NoSchemeAndTLD", "google", "1", "", errors.New("Not found")},
+		{"NoTLD", "https://google", "1", "", errors.New("Not found")},
 	}
 
 	for _, test := range tests2 {
 		t.Run("Get"+test.name, func(t *testing.T) {
-			s := &URLShortner{baseURL: "urls.com", i: 0, store: make(map[string]string)}
+			s := &URLShortner{i: 0, store: make(map[string]string)}
 
 			s.Shorten(test.in1)
 			resp, err := s.Get(test.in2)
