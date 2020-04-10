@@ -124,7 +124,8 @@ func httpFronted(ctx context.Context, u *URLShortner) {
 			w.WriteHeader(201)
 			w.Header().Add("content-type", "application/json")
 			w.Write(b)
-		}).Queries("u", "{url}").Methods("GET")
+			return
+		}).Queries("u", "{url}").Methods("POST")
 
 		r.HandleFunc("/{i}", func(w http.ResponseWriter, r *http.Request) {
 			vars := mux.Vars(r)
@@ -138,6 +139,7 @@ func httpFronted(ctx context.Context, u *URLShortner) {
 			}
 
 			http.Redirect(w, r, resp, 302)
+			return
 		})
 
 		s.Handler = r

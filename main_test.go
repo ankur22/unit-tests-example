@@ -132,13 +132,23 @@ func TestHTTP(t *testing.T) {
 
 	c := http.Client{
 		Timeout: 5 * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 
 	resp, err := c.Get("http://localhost:8080/1")
 	assert.NoError(t, err)
 	assert.Equal(t, 404, resp.StatusCode)
 
-	resp, err = c.Get("http://localhost:8080/shorten?u=http:google.com")
+	req, err := http.NewRequestWithContext(ctx, "POST", "http://localhost:8080/shorten", nil)
+	assert.NoError(t, err)
+
+	q := req.URL.Query()
+	q.Add("u", "https://google.com")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err = c.Do(req)
 	assert.NoError(t, err)
 	assert.Equal(t, 201, resp.StatusCode)
 
@@ -149,6 +159,10 @@ func TestHTTP(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "1", body.Index)
+
+	resp, err = c.Get("http://localhost:8080/1")
+	assert.NoError(t, err)
+	assert.Equal(t, 302, resp.StatusCode)
 
 	cancel()
 }
