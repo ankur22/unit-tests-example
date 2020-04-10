@@ -17,13 +17,11 @@ import (
 func TestURLShortner(t *testing.T) {
 
 	var tests = []struct {
-		name     string
-		in       string
-		expected string
-		err      error
+		name, in, expected string
+		err                error
 	}{
-		{"NoScheme", "google.com", "1", nil},
 		{"WithScheme", "https://google.com", "1", nil},
+		{"NoScheme", "google.com", "", errors.New("invalid")},
 		{"NoSchemeAndTLD", "google", "", errors.New("invalid")},
 		{"NoTLD", "https://google", "", errors.New("invalid")},
 	}
@@ -40,14 +38,11 @@ func TestURLShortner(t *testing.T) {
 	}
 
 	var tests2 = []struct {
-		name     string
-		in1      string
-		in2      string
-		expected string
-		err      error
+		name, in1, in2, expected string
+		err                      error
 	}{
-		{"NoScheme", "google.com", "1", "https://google.com", nil},
 		{"WithScheme", "https://google.com", "1", "https://google.com", nil},
+		{"NoScheme", "google.com", "", "", errors.New("Not found")},
 		{"NoSchemeAndTLD", "google", "1", "", errors.New("Not found")},
 		{"NoTLD", "https://google", "1", "", errors.New("Not found")},
 	}
@@ -73,13 +68,13 @@ func TestURLShortner(t *testing.T) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				_, err := u.Shorten("google.com")
+				_, err := u.Shorten("https://google.com")
 				assert.NoError(t, err)
 			}()
 		}
 		wg.Wait()
 
-		resp, err := u.Shorten("google.com")
+		resp, err := u.Shorten("https://google.com")
 		assert.NoError(t, err)
 		assert.Equal(t, strconv.Itoa(l+1), resp)
 	})
@@ -95,7 +90,7 @@ func BenchmarkURLShortner(b *testing.B) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				_, err := u.Shorten("google.com")
+				_, err := u.Shorten("https://google.com")
 				assert.NoError(b, err)
 			}()
 		}
@@ -114,7 +109,7 @@ func TestCLI(t *testing.T) {
 	defer close(o)
 	go cliFronted(ctx, u, c, o)
 
-	c <- "google.com"
+	c <- "https://google.com"
 	out := <-o
 
 	actual, err := u.GetURL(out)

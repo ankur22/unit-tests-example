@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"strconv"
@@ -167,12 +168,13 @@ type URLShortner struct {
 // Shorten will convert urls to a id
 // e.g. https://google.com/search?q=blah -> 12
 func (u *URLShortner) Shorten(in string) (string, error) {
-	if !strings.Contains(in, ".com") {
+	_, err := url.ParseRequestURI(in)
+	if err != nil {
 		return "", errors.New("invalid")
 	}
 
-	if !strings.Contains(in, "https://") {
-		in = fmt.Sprintf("https://%s", in)
+	if !strings.Contains(in, ".") {
+		return "", errors.New("invalid")
 	}
 
 	var val string
